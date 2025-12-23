@@ -39,7 +39,7 @@ namespace OrderAccumulator.Application.Service
                 decimal currentExposure = _exposureCalculator.GetCurrentExposure(order.Symbol.Value);
                 Console.WriteLine($"Ordem aceita para {order.Symbol.Value}. " +
                     $"Exposição atual: R$ {currentExposure:N2}" +
-                    $"Cl0rdID: {order.ClOrdID}");
+                    $"Cl0rdID: {order.Cl0rdID}");
 
                 return CreateAcceptedExecutionReport(order);
             }
@@ -68,7 +68,7 @@ namespace OrderAccumulator.Application.Service
             var execReport = new QuickFix.FIX44.ExecutionReport();
 
             // Identificadores
-            execReport.SetField(new ClOrdID(order.ClOrdID));
+            execReport.SetField(new ClOrdID(order.Cl0rdID));
             execReport.SetField(new OrderID(Guid.NewGuid().ToString()));
             execReport.SetField(new ExecID(Guid.NewGuid().ToString()));
 
@@ -98,7 +98,7 @@ namespace OrderAccumulator.Application.Service
             var execReport = new QuickFix.FIX44.ExecutionReport();
 
             // Identificadores
-            execReport.SetField(new ClOrdID(order.ClOrdID));
+            execReport.SetField(new ClOrdID(order.Cl0rdID));
             execReport.SetField(new OrderID(Guid.NewGuid().ToString()));
             execReport.SetField(new ExecID(Guid.NewGuid().ToString()));
 

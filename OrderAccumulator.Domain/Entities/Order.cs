@@ -8,7 +8,7 @@ namespace OrderAccumulator.Domain.Entities
         public OrderSideType Side { get; private  set; }
         public Money Price { get; private set; }
         public int Quantity { get; private set; }
-        public string ClOrdID { get; private set; }
+        public string Cl0rdID { get; private set; }
         public decimal FinancialValue => Price.Value * Quantity;
 
         public Order(Symbol symbol, OrderSideType side, Money price, int quantity, string cl0rdID)
@@ -22,7 +22,7 @@ namespace OrderAccumulator.Domain.Entities
             Side = side;
             Price = price;
             Quantity = quantity;
-            ClOrdID = cl0rdID;
+            Cl0rdID = cl0rdID;
         }
     }
 }
