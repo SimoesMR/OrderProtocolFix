@@ -1,0 +1,445 @@
+﻿@{
+    ViewData["Title"] = "Nova Ordem";
+}
+
+<style>
+    :root {
+        --bg-primary: #0f1117;
+        --bg-secondary: #1a1d26;
+        --bg-card: #1e222d;
+        --bg-input: #262a36;
+        --border-color: #2d3343;
+        --text-primary: #e1e4ea;
+        --text-secondary: #9ca3af;
+        --text-muted: #6b7280;
+        --accent-green: #22c55e;
+        --accent-green-hover: #16a34a;
+        --accent-red: #ef4444;
+        --accent-red-hover: #dc2626;
+    }
+
+    body {
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        min-height: 100vh;
+    }
+
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .page-subtitle {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+    }
+
+    /* Card */
+    .order-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+        .order-card .card-header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 12px 12px 0 0;
+            padding: 1.25rem 1.5rem;
+        }
+
+            .order-card .card-header h5 {
+                font-weight: 600;
+                color: var(--text-primary);
+                margin-bottom: 0.25rem;
+            }
+
+            .order-card .card-header p {
+                color: var(--text-muted);
+                font-size: 0.875rem;
+                margin-bottom: 0;
+            }
+
+        .order-card .card-body {
+            padding: 1.5rem;
+        }
+
+    /* Form */
+    .form-label {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        background-color: var(--bg-input);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 0.625rem 0.875rem;
+        font-size: 0.95rem;
+        color: var(--text-primary);
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: var(--bg-input);
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+            color: var(--text-primary);
+        }
+
+    .form-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    }
+
+        .form-select option {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+    .form-text {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+    }
+
+    /* Side Toggle Buttons */
+    .side-toggle-group {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .side-toggle {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        background: var(--bg-input);
+        cursor: pointer;
+        transition: all 0.2s;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+
+        .side-toggle:hover {
+            border-color: var(--text-muted);
+        }
+
+        .side-toggle.buy.active {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+            color: white;
+        }
+
+        .side-toggle.sell.active {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+            color: white;
+        }
+
+        .side-toggle svg {
+            width: 18px;
+            height: 18px;
+        }
+
+    /* Total Section */
+    .total-section {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1rem 1.25rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .total-label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    .total-value {
+        font-size: 1.375rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        font-family: 'Consolas', 'Monaco', monospace;
+    }
+
+    /* Submit Button */
+    .btn-execute {
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+        .btn-execute.buy {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+            color: white;
+        }
+
+            .btn-execute.buy:hover {
+                background: var(--accent-green-hover);
+                border-color: var(--accent-green-hover);
+                box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+            }
+
+        .btn-execute.sell {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+            color: white;
+        }
+
+            .btn-execute.sell:hover {
+                background: var(--accent-red-hover);
+                border-color: var(--accent-red-hover);
+                box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+            }
+
+    /* Alerts */
+    .alert-success {
+        background-color: rgba(34, 197, 94, 0.15);
+        border-color: rgba(34, 197, 94, 0.3);
+        color: #4ade80;
+    }
+
+    .alert-danger {
+        background-color: rgba(239, 68, 68, 0.15);
+        border-color: rgba(239, 68, 68, 0.3);
+        color: #f87171;
+    }
+
+    .alert .btn-close {
+        filter: invert(1) grayscale(100%) brightness(200%);
+    }
+
+    /* Footer */
+    .trade-footer {
+        text-align: center;
+        padding: 1.5rem 1rem;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-7">
+
+            <!-- Page Header -->
+            <div class="page-header mb-4">
+                <h1 class="page-title">Nova Ordem</h1>
+                <p class="page-subtitle">Execute suas operações de compra e venda de ações</p>
+            </div>
+
+            <!-- Order Card -->
+            <div class="card order-card">
+                <div class="card-header">
+                    <h5>Detalhes da Ordem</h5>
+                    <p>Preencha os dados para executar sua operação</p>
+                </div>
+
+                <div class="card-body">
+                    <form id="orderForm" onsubmit="handleSubmit(event)">
+
+                        <!-- Ativo -->
+                        <div class="mb-3">
+                            <label for="symbol" class="form-label">Ativo</label>
+                            <select class="form-select" id="symbol" name="symbol" required>
+                                <option value="PETR4">PETR4 - Petrobras PN</option>
+                                <option value="VALE3">VALE3 - Vale ON</option>
+                                <option value="VIIA4">VIIA4 - Via Varejo PN</option>
+                            </select>
+                        </div>
+
+                        <!-- Operação -->
+                        <div class="mb-3">
+                            <label class="form-label">Operação</label>
+                            <div class="side-toggle-group">
+                                <button type="button" class="side-toggle buy active" onclick="selectSide('BUY')">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <path d="M7 17l5-5 5 5" />
+                                        <path d="M7 12l5-5 5 5" />
+                                    </svg>
+                                    Compra
+                                </button>
+                                <button type="button" class="side-toggle sell" onclick="selectSide('SELL')">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <path d="M7 7l5 5 5-5" />
+                                        <path d="M7 12l5 5 5-5" />
+                                    </svg>
+                                    Venda
+                                </button>
+                            </div>
+                            <input type="hidden" id="side" name="side" value="BUY">
+                        </div>
+
+                        <!-- Quantidade -->
+                        <div class="mb-3">
+                            <label for="quantity" class="form-label">Quantidade</label>
+                            <input type="number" class="form-control" id="quantity" name="quantity"
+                                   min="1" max="99999" value="1" required oninput="updateTotal()">
+                            <small class="form-text">Valor positivo inteiro menor que 100.000</small>
+                        </div>
+
+                        <!-- Preço -->
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Preço (R$)</label>
+                            <input type="number" class="form-control" id="price" name="price"
+                                   min="0.01" max="999.99" step="0.01" value="1.00" required oninput="updateTotal()">
+                            <small class="form-text">Valor positivo decimal múltiplo de 0.01 e menor que 1.000</small>
+                        </div>
+
+                        <!-- Total -->
+                        <div class="total-section mb-4">
+                            <span class="total-label">Valor Total da Operação:</span>
+                            <span class="total-value">R$ <span id="totalValue">1,00</span></span>
+                        </div>
+
+                        <!-- Submit -->
+                        <button type="submit" class="btn btn-execute buy w-100" id="submitBtn">
+                            Executar Compra
+                        </button>
+                    </form>
+
+                    <!-- Alert -->
+                    <div id="responseAlert" class="mt-5" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="trade-footer">
+                <p class="mb-1">&copy; 2025 - Order Generator - Todos os direitos reservados</p>
+                <p class="mb-0">Operações sujeitas a riscos. Consulte seu assessor de investimentos.</p>
+            </footer>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedSide = 'BUY';
+
+    function selectSide(side) {
+        selectedSide = side;
+        document.getElementById('side').value = side;
+
+        const buyBtn = document.querySelector('.side-toggle.buy');
+        const sellBtn = document.querySelector('.side-toggle.sell');
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (side === 'BUY') {
+            buyBtn.classList.add('active');
+            sellBtn.classList.remove('active');
+            submitBtn.className = 'btn btn-execute buy w-100';
+            submitBtn.textContent = 'Executar Compra';
+        } else {
+            buyBtn.classList.remove('active');
+            sellBtn.classList.add('active');
+            submitBtn.className = 'btn btn-execute sell w-100';
+            submitBtn.textContent = 'Executar Venda';
+        }
+    }
+
+    function updateTotal() {
+        const quantity = parseInt(document.getElementById('quantity').value) || 0;
+        const price = parseFloat(document.getElementById('price').value) || 0;
+        const total = quantity * price;
+        document.getElementById('totalValue').textContent = total.toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
+    function handleSubmit(event) {
+        event.preventDefault();
+
+        const symbol = document.getElementById('symbol').value;
+        const side = document.getElementById('side').value;
+        const quantity = parseInt(document.getElementById('quantity').value);
+        const price = parseFloat(document.getElementById('price').value);
+
+        // Validações
+        if (quantity <= 0 || quantity >= 100000) {
+            showAlert('Quantidade deve ser um valor positivo inteiro menor que 100.000.', 'danger');
+            return;
+        }
+
+        if (price <= 0 || price >= 1000 || !isMultipleOfPointZeroOne(price)) {
+            showAlert('Preço deve ser positivo, menor que 1.000 e múltiplo de 0.01.', 'danger');
+            return;
+        }
+
+        const orderData = {
+            Symbol: symbol,
+            Side: side,
+            Quantity: quantity,
+            Price: price
+        };
+
+        const submitBtn = document.getElementById('submitBtn');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
+
+            fetch('/Home/SendOrder', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orderData)
+    })
+    .then(async response => {
+        const data = await response.json();
+
+        if (response.status === 422) {
+            showAlert(data.message, 'danger');
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(data.message || `Erro HTTP: ${response.status}`);
+        }
+
+        showAlert(data.message, 'success');
+    })
+    .catch(error => {
+        showAlert(error.message, 'danger');
+    })
+    .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+    });
+    }
+
+    function isMultipleOfPointZeroOne(value) {
+        const rounded = Math.round(value * 100) / 100;
+        return Math.abs(value - rounded) < 0.001;
+    }
+
+    function showAlert(message, type) {
+        const alertDiv = document.getElementById('responseAlert');
+        alertDiv.className = `mt-3 alert alert-${type} alert-dismissible fade show`;
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        alertDiv.style.display = 'block';
+    }
+
+    // Initialize
+    updateTotal();
+</script>
