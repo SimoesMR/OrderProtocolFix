@@ -6,11 +6,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fix-config", "fix-config", "{122858E9-DEE1-4F6B-8F7F-BD6902C7C633}"
-	ProjectSection(SolutionItems) = preProject
-		acceptor.cfg = acceptor.cfg
-		FIX44.xml = FIX44.xml
-		initiator.cfg = initiator.cfg
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OrderGenerator", "OrderGenerator", "{E205A51B-7E9C-49E0-859E-708F5B2B3F57}"
 EndProject

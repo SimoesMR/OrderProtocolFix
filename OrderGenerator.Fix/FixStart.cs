@@ -17,7 +17,7 @@ namespace OrderGenerator.Fix
         }
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            var settings = new SessionSettings("E:\\ProjetoBaseFlowa\\ProvaBaseFlowa(2)\\OrderFixSolution\\initiator.cfg");
+            var settings = new SessionSettings("initiator.cfg");
             var storeFactory = new FileStoreFactory(settings);
             var logFactory = new FileLogFactory(settings);
            

@@ -5,7 +5,7 @@ using QuickFix;
 using QuickFix.Logger;
 using QuickFix.Store;
 
-SessionSettings settings = new SessionSettings("E:\\ProjetoBaseFlowa\\ProvaBaseFlowa(2)\\OrderFixSolution\\acceptor.cfg");
+SessionSettings settings = new SessionSettings("acceptor.cfg");
 var exposureCalculator = new ExposureCalculator();
 var orderProcessor = new OrderProcessor(exposureCalculator);
 IApplication app = new FixApplication(orderProcessor);

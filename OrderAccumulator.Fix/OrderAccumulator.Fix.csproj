@@ -15,4 +15,12 @@
     <ProjectReference Include="..\OrderAccumulator.Application\OrderAccumulator.Application.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<None Update="acceptor.cfg">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="FIX44.xml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 </Project>

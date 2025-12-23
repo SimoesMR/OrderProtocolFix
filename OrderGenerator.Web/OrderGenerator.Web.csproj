@@ -11,4 +11,13 @@
     <ProjectReference Include="..\OrderGenerator.Fix\OrderGenerator.Fix.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="FIX44.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="initiator.cfg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
