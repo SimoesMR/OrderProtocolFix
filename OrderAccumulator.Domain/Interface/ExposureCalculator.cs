@@ -5,7 +5,7 @@ namespace OrderAccumulator.Domain.Interface
 {
     public class ExposureCalculator : IExposureCalculator
     {
-        private const decimal EXPOSURE_LIMIT = 10_000; // R$ 100 milhões
+        private const decimal EXPOSURE_LIMIT = 100_000_000; 
         private readonly Dictionary<string, SymbolExposure> _exposures = new();
 
         public decimal CalculateNewExposure(string symbol, Order newOrder)

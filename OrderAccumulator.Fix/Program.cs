@@ -4,6 +4,15 @@ using OrderAccumulator.Fix;
 using QuickFix;
 using QuickFix.Logger;
 using QuickFix.Store;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.File("logs/orderaccumulator-.log",
+        rollingInterval: RollingInterval.Day,
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+    .Enrich.FromLogContext()
+    .CreateLogger();
 
 SessionSettings settings = new SessionSettings("acceptor.cfg");
 var exposureCalculator = new ExposureCalculator();

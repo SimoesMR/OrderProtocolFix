@@ -14,6 +14,9 @@
             if (!ValidSymbols.Contains(value))
                 throw new ArgumentException($"Symbol must be one of the following: {string.Join(", ", ValidSymbols)}");
 
+            if(value.Length != 5)
+                throw new ArgumentException("Symbol must be exactly 5 characters.");
+
             Value = value;
         }
     }

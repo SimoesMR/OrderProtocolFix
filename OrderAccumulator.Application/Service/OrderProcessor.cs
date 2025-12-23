@@ -4,6 +4,7 @@ using OrderAccumulator.Domain.Interface;
 using OrderAccumulator.Domain.ValueObject;
 using QuickFix;
 using QuickFix.Fields;
+using Serilog;
 
 
 namespace OrderAccumulator.Application.Service
@@ -11,10 +12,12 @@ namespace OrderAccumulator.Application.Service
     public class OrderProcessor : IOrderProcessor
     {
         private readonly IExposureCalculator _exposureCalculator;
+        private readonly ILogger _logger;
 
         public OrderProcessor(IExposureCalculator exposureCalculator)
         {
             _exposureCalculator = exposureCalculator;
+            _logger = Log.ForContext<OrderProcessor>();
         }
 
         public Message ProcessNewOrder(Message message)
@@ -24,10 +27,13 @@ namespace OrderAccumulator.Application.Service
                 // extract data from message to order
                 Order order = ExtractOrderFromMessage(message);
 
+                _logger.Information($"Processando ordem {order.Cl0rdID} para {order.Symbol.Value} - {order.Side} {order.Quantity}x @ {order.Price.Value:N2}");
+
                 //verify if the limit will exceed the limit
                 if (_exposureCalculator.VerifyExceedLimit(order.Symbol.Value, order))
                 {
-                    Console.WriteLine($"Ordem rejeitada: excede limite de exposição limite R$0,00 a R$ 100.000.000");
+                    _logger.Warning($"Ordem {order.Cl0rdID} REJEITADA: excede limite de exposição para {order.Symbol.Value}");
+
                     return CreateRejectedExecutionReport(order,
                         "Ordem rejeitada: excede limite de exposição limite R$0, 00 a R$ 100.000.000");
                 }
@@ -37,15 +43,15 @@ namespace OrderAccumulator.Application.Service
 
                 //Update exposure
                 decimal currentExposure = _exposureCalculator.GetCurrentExposure(order.Symbol.Value);
-                Console.WriteLine($"Ordem aceita para {order.Symbol.Value}. " +
-                    $"Exposição atual: R$ {currentExposure:N2}" +
-                    $"Cl0rdID: {order.Cl0rdID}");
+
+                _logger.Information($"Ordem {order.Cl0rdID} ACEITA para {order.Symbol.Value}. Exposição atual: R$ {currentExposure:N2}");
 
                 return CreateAcceptedExecutionReport(order);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao processar ordem: {ex.Message}");
+                _logger.Error(ex, "Erro ao processar ordem da mensagem FIX");
+
                 return CreateRejectedExecutionExceptionReport(
                     "UNKNOWN",
                     $"Erro no processamento: {ex.Message}.");
