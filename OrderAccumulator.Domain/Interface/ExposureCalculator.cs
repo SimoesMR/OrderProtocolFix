@@ -23,7 +23,7 @@ namespace OrderAccumulator.Domain.Interface
         public bool VerifyExceedLimit(string symbol, Order newOrder)
         {
             var projectedExposure = CalculateNewExposure(symbol, newOrder);
-            return Math.Abs(projectedExposure) >= EXPOSURE_LIMIT || projectedExposure < 0;
+            return Math.Abs(projectedExposure) > EXPOSURE_LIMIT || projectedExposure < 0;
         }
 
         public void AddOrder(Order order)

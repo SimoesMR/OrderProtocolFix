@@ -150,6 +150,8 @@ namespace OrderTests.OrderAccumulatorTests
             var order2 = CreateOrder("PETR4", OrderSideType.Buy, 99_999, 1.00m);
 
             var exceeds = _calculator.VerifyExceedLimit("PETR4", order2);
+            
+            Assert.True(exceeds);
         }
 
         [Fact]

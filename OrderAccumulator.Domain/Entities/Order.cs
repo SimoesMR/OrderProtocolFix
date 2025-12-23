@@ -15,8 +15,8 @@ namespace OrderAccumulator.Domain.Entities
         {
             if(price.Value > 1_000)
                 throw new ArgumentException("Price cannot be higher than 1000");
-            if(quantity <= 0 || quantity > 100_000)
-                throw new ArgumentException("Quantity must be between 1 and 1,000,000");
+            if(quantity < 0 || quantity > 100_000)
+                throw new ArgumentException("Quantity must be between 1 and 100.000");
 
             Symbol = symbol;
             Side = side;
