@@ -1,6 +1,7 @@
 using OrderAccumulator.Domain.Entities;
 using OrderAccumulator.Domain.Interface;
 using OrderAccumulator.Domain.ValueObject;
+using System.Runtime.Intrinsics.Arm;
 
 namespace OrderTests.OrderAccumulatorTests
 {
@@ -143,21 +144,28 @@ namespace OrderTests.OrderAccumulatorTests
         [Fact]
         public void VerifyExceedLimit_WhenAtLimit_ReturnsTrue()
         {
-            var order = CreateOrder("PETR4", OrderSideType.Buy, 400, 25.00m);
+            var order1 = CreateOrder("PETR4", OrderSideType.Buy, 99_999, 999.99m);
+            _calculator.AddOrder(order1);
 
-            var exceeds = _calculator.VerifyExceedLimit("PETR4", order);
+            var order2 = CreateOrder("PETR4", OrderSideType.Buy, 99_999, 1.00m);
 
-            Assert.True(exceeds);
+            var exceeds = _calculator.VerifyExceedLimit("PETR4", order2);
         }
 
         [Fact]
         public void VerifyExceedLimit_WhenAboveLimit_ReturnsTrue()
         {
-            var order = CreateOrder("PETR4", OrderSideType.Buy, 500, 25.00m); 
+            var order1 = CreateOrder("PETR4", OrderSideType.Buy, 50_000, 999.00m);
+            _calculator.AddOrder(order1);
 
+            var order2 = CreateOrder("PETR4", OrderSideType.Buy, 50_000, 999.00m);
+            _calculator.AddOrder(order2);
 
-            var exceeds = _calculator.VerifyExceedLimit("PETR4", order);
+            var newOrder = CreateOrder("PETR4", OrderSideType.Buy, 500, 250.00m);
 
+            var exceeds = _calculator.VerifyExceedLimit("PETR4", newOrder);
+
+            // Assert
             Assert.True(exceeds);
         }
 
@@ -174,10 +182,10 @@ namespace OrderTests.OrderAccumulatorTests
         [Fact]
         public void VerifyExceedLimit_WhenCumulativeExceedsLimit_ReturnsTrue()
         {
-            var existingOrder = CreateOrder("PETR4", OrderSideType.Buy, 300, 25.00m);
+            var existingOrder = CreateOrder("PETR4", OrderSideType.Buy, 99999, 999.00m);
             _calculator.AddOrder(existingOrder);
 
-            var newOrder = CreateOrder("PETR4", OrderSideType.Buy, 150, 25.00m);
+            var newOrder = CreateOrder("PETR4", OrderSideType.Buy, 99999, 999.00m);
 
             var exceeds = _calculator.VerifyExceedLimit("PETR4", newOrder);
 
@@ -266,21 +274,27 @@ namespace OrderTests.OrderAccumulatorTests
         [Fact]
         public void FullWorkflow_VerifyLimitBeforeAdd_PreventsExcessiveExposure()
         {
-
-            var order1 = CreateOrder("PETR4", OrderSideType.Buy, 300, 25.00m);
-
+            //Adiciiona ordem R$ 49.950.000
+            var order1 = CreateOrder("PETR4", OrderSideType.Buy, 50_000, 999.00m);
             if (!_calculator.VerifyExceedLimit("PETR4", order1))
             {
                 _calculator.AddOrder(order1);
             }
 
-            var order2 = CreateOrder("PETR4", OrderSideType.Buy, 200, 25.00m);
+            //Adiciiona ordem R$ 49.950.000
+            var order2 = CreateOrder("PETR4", OrderSideType.Buy, 50_000, 999.00m);
+            if (!_calculator.VerifyExceedLimit("PETR4", order2))
+            {
+                _calculator.AddOrder(order2);
+            }
 
+            // Tenta adicionar ordem que excederia o limite R$ 99.900.000 + R$ 150.000 = R$ 100.050.000
+            var order3 = CreateOrder("PETR4", OrderSideType.Buy, 1_000, 150.00m);
 
-            var exceeds = _calculator.VerifyExceedLimit("PETR4", order2);
+            var exceeds = _calculator.VerifyExceedLimit("PETR4", order3);
 
-            Assert.True(exceeds);
-            Assert.Equal(7500m, _calculator.GetCurrentExposure("PETR4"));
+            Assert.True(exceeds);  // Deve exceder
+            Assert.Equal(99_900_000m, _calculator.GetCurrentExposure("PETR4"));
         }
 
         #endregion

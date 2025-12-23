@@ -23,7 +23,7 @@ namespace OrderTests.OrderAccumulatorTests.Objects
             Assert.Equal(OrderSideType.Buy, order.Side);
             Assert.Equal(25.50m, order.Price.Value);
             Assert.Equal(100, order.Quantity);
-            Assert.Equal("ORDER123", order.ClOrdID);
+            Assert.Equal("ORDER123", order.Cl0rdID);
         }
 
         [Theory]
