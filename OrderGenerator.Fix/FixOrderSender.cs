@@ -3,6 +3,7 @@ using OrderGenerator.Application.Interfaces;
 using QuickFix;
 using QuickFix.Fields;
 using QuickFix.FIX44;
+using Serilog;
 using System.Collections.Concurrent;
 
 namespace OrderGenerator.Fix
@@ -11,6 +12,7 @@ namespace OrderGenerator.Fix
     {
         private readonly FixApplication _fixApp;
         private readonly ConcurrentDictionary<string, TaskCompletionSource<OrderResult>> _pendingOrders = new();
+        private readonly ILogger _logger;
 
         // Evento para notificar quando um ExecutionReport é recebido
         public event EventHandler<ExecutionReportEventArgs>? ExecutionReportReceived;
@@ -20,6 +22,7 @@ namespace OrderGenerator.Fix
             _fixApp = fixApp;
             // Registra o handler para o evento do FixApplication
             _fixApp.OnExecutionReportReceived += HandleExecutionReport;
+            _logger = Log.ForContext<FixOrderSender>();
         }
 
         public Task<OrderResult> FixOrderSenderAsync(OrderDto dto)
@@ -27,6 +30,10 @@ namespace OrderGenerator.Fix
             try
             {
                 var clOrdId = Guid.NewGuid().ToString();
+
+                _logger.Information("Criando ordem FIX: ClOrdID={ClOrdId} Symbol={Symbol}",
+                    clOrdId, dto.Symbol);
+
                 var order = new NewOrderSingle(
                     new ClOrdID(clOrdId),
                     new Symbol(dto.Symbol),
@@ -52,6 +59,7 @@ namespace OrderGenerator.Fix
                         {
                             if (!pendingTcs.Task.IsCompleted)
                             {
+                                _logger.Warning("Timeout para ClOrdID={ClOrdId}", clOrdId);
                                 pendingTcs.SetResult(new OrderResult(false, "Timeout aguardando resposta do FIX"));
                             }
                         }
@@ -60,7 +68,8 @@ namespace OrderGenerator.Fix
                     return tcs.Task;
                 }
                 else
-                { 
+                {
+                    _logger.Error("Falha ao enviar ordem para FIX");
                     return Task.FromResult(new OrderResult(false, "Falha ao enviar ordem ao FIX"));
                 }
             }
@@ -74,6 +83,8 @@ namespace OrderGenerator.Fix
         {
             var clOrdId = e.ExecutionReport.IsSetClOrdID() ? e.ExecutionReport.ClOrdID.Value : null;
 
+            _logger.Debug("HandleExecutionReport: ClOrdID={ClOrdId}", clOrdId);
+
             if (!string.IsNullOrEmpty(clOrdId) && _pendingOrders.TryRemove(clOrdId, out var tcs))
             {
                 // Determina o resultado baseado no status da execução
@@ -82,6 +93,9 @@ namespace OrderGenerator.Fix
                 var message = isRejected && e.ExecutionReport.IsSetText() 
                     ? e.ExecutionReport.Text.Value 
                     : $"Ordem {(isRejected ? "rejeitada" : "processada")}";
+
+                _logger.Information("Ordem {Status}: ClOrdID={ClOrdId}",
+                    isRejected ? "REJEITADA" : "ACEITA", clOrdId);
 
                 var result = new OrderResult(!isRejected, message);
                 tcs.SetResult(result);

@@ -1,32 +1,37 @@
-﻿using OrderGenerator.Application.Interfaces;
-using QuickFix;
-using QuickFix.Fields;
+﻿using QuickFix;
 using QuickFix.FIX44;
+using Serilog;
 
 namespace OrderGenerator.Fix
 {
     public class FixApplication : MessageCracker, IApplication
     {
         private SessionID _sessionId;
+        private readonly ILogger _logger;
 
         // Evento para notificar quando um ExecutionReport é recebido
         public event EventHandler<OrderGenerator.Fix.ExecutionReportEventArgs>? OnExecutionReportReceived;
 
+        public FixApplication() 
+        {
+            _logger = Log.ForContext<FixApplication>();
+        }
+
         public void OnCreate(SessionID sessionID)
         {
             _sessionId = sessionID;
-            Console.WriteLine($"Sessão criada: {sessionID}");
+            _logger.Information("Sessão FIX criada: {SessionId}", sessionID);
         }
 
         //Quando loga(faz a conexao) com o acceptor
         public void OnLogon(SessionID sessionID)
         {
-            Console.WriteLine($"FIX Logon");
+            _logger.Information("FIX Logon: {SessionId}", sessionID);
         }
 
         //Quando logout(desconecta) com o acceptor
         public void OnLogout(SessionID sessionID)
-            => Console.WriteLine("FIX Logout");
+            => _logger.Warning("FIX Logout: {SessionId}", sessionID);
 
         public void ToAdmin(QuickFix.Message message, SessionID sessionID)
         {
@@ -35,7 +40,7 @@ namespace OrderGenerator.Fix
         }
 
         public void ToApp(QuickFix.Message message, SessionID sessionID) {
-            Console.WriteLine($"Enviado para o console order");
+            _logger.Debug($"Mensagem enviada para Acceptor: {message}");
         }
         public void FromApp(QuickFix.Message message, SessionID sessionID)
         {
@@ -46,7 +51,12 @@ namespace OrderGenerator.Fix
         public bool SendOrder(NewOrderSingle order)
         {
             if (_sessionId == null)
+            {
+                _logger.Error("Sessão FIX não iniciada!");
                 throw new InvalidOperationException("Sessão FIX não iniciada");
+            }
+
+            _logger.Information("Enviando ordem: ClOrdID={ClOrdId}", order.ClOrdID.Value);
 
             var responde = Session.SendToTarget(order, _sessionId);
             return responde;
@@ -101,8 +111,11 @@ namespace OrderGenerator.Fix
             }
 
             Console.WriteLine("╚══════════════════════════════════════════════════════════════╝\n");
+            
+            _logger.Information(
+               "ExecutionReport: ClOrdID={ClOrdId} Symbol={Symbol} ExecType={ExecType} OrdStatus={OrdStatus}",
+               clOrdId, symbol, GetExecTypeDescription(execType), GetOrdStatusDescription(ordStatus));
 
-            // Dispara o evento
             OnExecutionReportReceived?.Invoke(this, new OrderGenerator.Fix.ExecutionReportEventArgs(execReport, sessionID));
         }
 
