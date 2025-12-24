@@ -44,7 +44,7 @@ namespace OrderGenerator.Fix
         }
         public void FromApp(QuickFix.Message message, SessionID sessionID)
         {
-            Console.WriteLine($"Recebido do console order");
+            _logger.Information($"Recebido ordem do console order");
             Crack(message, sessionID);
         }   
 
@@ -64,27 +64,14 @@ namespace OrderGenerator.Fix
 
         public void OnMessage(QuickFix.FIX44.ExecutionReport execReport, SessionID sessionID)
         {
-            Console.WriteLine($"OnMessage recebido do console order");
-            Console.WriteLine("\n╔══════════════════════════════════════════════════════════════╗");
-            Console.WriteLine("║              EXECUTION REPORT RECEBIDO                       ║");
-            Console.WriteLine("╠══════════════════════════════════════════════════════════════╣");
-
+            _logger.Information($"Recebido ordem do console order");
+    
             // Identificadores
             var clOrdId = execReport.IsSetClOrdID() ? execReport.ClOrdID.Value : "N/A";
-            var orderId = execReport.IsSetOrderID() ? execReport.OrderID.Value : "N/A";
-            var execId = execReport.IsSetExecID() ? execReport.ExecID.Value : "N/A";
-
-            Console.WriteLine($"║ ClOrdID:  {clOrdId,-50} ║");
-            Console.WriteLine($"║ OrderID:  {orderId,-50} ║");
-            Console.WriteLine($"║ ExecID:   {execId,-50} ║");
-
+ 
             // Status
             var execType = execReport.IsSetExecType() ? execReport.ExecType.Value : ' ';
             var ordStatus = execReport.IsSetOrdStatus() ? execReport.OrdStatus.Value : ' ';
-
-            Console.WriteLine("╠══════════════════════════════════════════════════════════════╣");
-            Console.WriteLine($"║ ExecType:   {GetExecTypeDescription(execType),-48} ║");
-            Console.WriteLine($"║ OrdStatus:  {GetOrdStatusDescription(ordStatus),-48} ║");
 
             // Dados da ordem
             var symbol = execReport.IsSetSymbol() ? execReport.Symbol.Value : "N/A";
@@ -94,27 +81,11 @@ namespace OrderGenerator.Fix
             var leavesQty = execReport.IsSetLeavesQty() ? execReport.LeavesQty.Value : 0;
             var cumQty = execReport.IsSetCumQty() ? execReport.CumQty.Value : 0;
 
-            Console.WriteLine("╠══════════════════════════════════════════════════════════════╣");
-            Console.WriteLine($"║ Symbol:     {symbol,-48} ║");
-            Console.WriteLine($"║ Side:       {side,-48} ║");
-            Console.WriteLine($"║ Price:      R$ {price,-45:N2} ║");
-            Console.WriteLine($"║ Quantity:   {qty,-48:N0} ║");
-            Console.WriteLine($"║ LeavesQty:  {leavesQty,-48:N0} ║");
-            Console.WriteLine($"║ CumQty:     {cumQty,-48:N0} ║");
-
-            // Motivo de rejeição (se houver)
-            if (execReport.IsSetText())
-            {
-                var text = execReport.Text.Value;
-                Console.WriteLine("╠══════════════════════════════════════════════════════════════╣");
-                Console.WriteLine($"║ Mensagem: {text,-50} ║");
-            }
-
-            Console.WriteLine("╚══════════════════════════════════════════════════════════════╝\n");
-            
             _logger.Information(
-               "ExecutionReport: ClOrdID={ClOrdId} Symbol={Symbol} ExecType={ExecType} OrdStatus={OrdStatus}",
-               clOrdId, symbol, GetExecTypeDescription(execType), GetOrdStatusDescription(ordStatus));
+               "ExecutionReport: ClOrdID={ClOrdId} Symbol={Symbol} Side={Side} Price={Price} OrderQty={OrderQty} " +
+               "CumQty={CumQty} LeavesQty={LeavesQty} ExecType={ExecType} OrdStatus={OrdStatus}",
+               clOrdId, symbol, side, price, qty, cumQty, leavesQty, 
+               GetExecTypeDescription(execType), GetOrdStatusDescription(ordStatus));
 
             OnExecutionReportReceived?.Invoke(this, new OrderGenerator.Fix.ExecutionReportEventArgs(execReport, sessionID));
         }
